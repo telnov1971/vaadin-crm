@@ -10,10 +10,17 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.PWA;
 import com.vaadin.tutorial.crm.ui.dashboard.DashboardView;
 import com.vaadin.tutorial.crm.ui.list.ListView;
 
 @CssImport("./styles/shared-styles.css")
+// создает javascript контролирующий трафик приложения
+@PWA(name = "VaadinCRM",
+        shortName = "CRM",
+        offlineResources = {
+        "./styles/offline.css",
+        "./images/offline.png"})
 public class MainLayout extends AppLayout {
     public MainLayout() {
         createHeader();
