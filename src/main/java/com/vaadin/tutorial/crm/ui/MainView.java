@@ -3,6 +3,8 @@ package com.vaadin.tutorial.crm.ui;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.tutorial.crm.backend.entity.Company;
@@ -30,16 +32,27 @@ import com.vaadin.tutorial.crm.backend.service.ContactService;
 public class MainView extends VerticalLayout {
     // задание сущности для построения таблицы
     private Grid<Contact> grid = new Grid(Contact.class,false);
-
     private final ContactService contactService;
+    // поле для указания фильтра
+    private TextField filterText = new TextField();
 
     public MainView(ContactService contactService) {
         this.contactService = contactService;
         addClassName("list-view");  // класс CSS
         setSizeFull();              // размер во всё окно
-        configureGrid();
-        add(grid);
+        configureFilter();          // настройка фильтра
+        configureGrid();            // настройка таблицы
+        add(filterText, grid);
         updateList();
+    }
+
+    private void configureFilter() {
+        filterText.setPlaceholder("Filter by name...");
+        filterText.setClearButtonVisible(true);
+        // автоматическое сообщение об обновлении после нескольких введенных букв
+        filterText.setValueChangeMode(ValueChangeMode.LAZY);
+        // вызов функции при обновлении
+        filterText.addValueChangeListener(e -> updateList());
     }
 
     private void configureGrid() {
@@ -64,6 +77,6 @@ public class MainView extends VerticalLayout {
 
     private void updateList() {
         // загрузим в таблицу все контакты
-        grid.setItems(contactService.findAll());
+        grid.setItems(contactService.findAll(filterText.getValue()));
     }
 }
