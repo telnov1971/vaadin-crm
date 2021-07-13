@@ -7,7 +7,7 @@
 }
 .list-view .contact-form {
   flex: 1;                            /* одна колонка под форму редактирования */
-  /* padding: var(--lumo-space-m);       /* стандартные отступы */
+  padding: var(--lumo-space-m);       /* стандартные отступы */
 }
 @media all and (max-width: 1100px) {  /* скрываем панель и таблицу на узких экранах */
   .list-view.editing .toolbar,

@@ -56,6 +56,7 @@ public class MainView extends VerticalLayout {
         add(filterText, content);
 
         updateList();
+        closeEditor();
     }
 
     private void configureFilter() {
@@ -85,6 +86,26 @@ public class MainView extends VerticalLayout {
 
         // автоматическая ширина стобцов таблицы
         grid.getColumns().forEach(col -> col.setAutoWidth(true));
+
+        // обработка события смены выбранной строки таблицы
+        grid.asSingleSelect().addValueChangeListener(event ->
+                editContact(event.getValue()));
+    }
+
+    public void editContact(Contact contact) {
+        if (contact == null) {
+            closeEditor();
+        } else {
+            form.setContact(contact);
+            form.setVisible(true);
+            addClassName("editing");
+        }
+    }
+
+    private void closeEditor() {
+        form.setContact(null);
+        form.setVisible(false);
+        removeClassName("editing");
     }
 
     private void updateList() {
