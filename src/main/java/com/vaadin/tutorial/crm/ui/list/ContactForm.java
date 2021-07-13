@@ -1,4 +1,4 @@
-package com.vaadin.tutorial.crm.ui;
+package com.vaadin.tutorial.crm.ui.list;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;

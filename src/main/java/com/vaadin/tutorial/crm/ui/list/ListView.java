@@ -1,40 +1,42 @@
-package com.vaadin.tutorial.crm.ui;
+package com.vaadin.tutorial.crm.ui.list;
 
-import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
 import com.vaadin.tutorial.crm.backend.entity.Company;
 import com.vaadin.tutorial.crm.backend.entity.Contact;
 import com.vaadin.tutorial.crm.backend.service.CompanyService;
 import com.vaadin.tutorial.crm.backend.service.ContactService;
+import com.vaadin.tutorial.crm.ui.MainLayout;
 
-@Route("")
-@PWA(name = "Vaadin Application",
-        shortName = "Vaadin App",
-        description = "This is an example Vaadin application.",
-        enableInstallPrompt = false)
-@CssImport("./styles/shared-styles.css")
-public class MainView extends VerticalLayout {
+// Любой Vaadin компонент может быть указан целью навигации с помощью
+// аннотации @Route("<path>"). Навигация может быть вложенной с определением
+// родительского уровня в аннотации: @Route(value = "list", parent=MainView.class)
+@Route(value="", layout = MainLayout.class)
+@PageTitle("Contacts | Vaadin CRM")
+public class ListView extends VerticalLayout {
     // задание сущности для построения таблицы
     private Grid<Contact> grid = new Grid(Contact.class,false);
     private final ContactService contactService;
     private final CompanyService companyService;
     // поле для указания фильтра
     private TextField filterText = new TextField();
+    private HorizontalLayout toolbar;
     // форма редактирования контакта
     private ContactForm form;
 
-    public MainView(ContactService contactService, CompanyService companyService) {
+    public ListView(ContactService contactService, CompanyService companyService) {
         this.contactService = contactService;
         this.companyService = companyService;
         addClassName("list-view");  // класс CSS
         setSizeFull();              // размер во всё окно
-        configureFilter();          // настройка фильтра
+        toolbar = getToolbar();          // настройка инструментов
         configureGrid();            // настройка таблицы
 
         form = new ContactForm(this.companyService.findAll());
@@ -46,19 +48,26 @@ public class MainView extends VerticalLayout {
         Div content = new Div(grid, form);
         content.addClassName("content");
         content.setSizeFull();
-        add(filterText, content);
+        add(toolbar, content);
 
         updateList();
         closeEditor();
     }
 
-    private void configureFilter() {
+    private HorizontalLayout getToolbar() {
         filterText.setPlaceholder("Filter by name...");
         filterText.setClearButtonVisible(true);
         // автоматическое сообщение об обновлении после нескольких введенных букв
         filterText.setValueChangeMode(ValueChangeMode.LAZY);
         // вызов функции при обновлении
         filterText.addValueChangeListener(e -> updateList());
+
+        Button addContactButton = new Button("Add contact");
+        addContactButton.addClickListener(event -> addContact());
+
+        HorizontalLayout toolbar = new HorizontalLayout(filterText,addContactButton);
+        toolbar.addClassName("toolbar");
+        return toolbar;
     }
 
     private void configureGrid() {
@@ -83,6 +92,11 @@ public class MainView extends VerticalLayout {
         // обработка события смены выбранной строки таблицы
         grid.asSingleSelect().addValueChangeListener(event ->
                 editContact(event.getValue()));
+    }
+
+    private void addContact() {
+        grid.asSingleSelect().clear();
+        editContact(new Contact());
     }
 
     public void editContact(Contact contact) {
