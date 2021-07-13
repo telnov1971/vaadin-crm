@@ -13,18 +13,6 @@ import com.vaadin.tutorial.crm.backend.entity.Contact;
 import com.vaadin.tutorial.crm.backend.service.CompanyService;
 import com.vaadin.tutorial.crm.backend.service.ContactService;
 
-/**
- * A sample Vaadin view class.
- * <p>
- * To implement a Vaadin view just extend any Vaadin component and
- * use @Route annotation to announce it in a URL as a Spring managed
- * bean.
- * Use the @PWA annotation make the application installable on phones,
- * tablets and some desktop browsers.
- * <p>
- * A new instance of this class is created for every new user and every
- * browser tab/window.
- */
 @Route("")
 @PWA(name = "Vaadin Application",
         shortName = "Vaadin App",
@@ -50,6 +38,11 @@ public class MainView extends VerticalLayout {
         configureGrid();            // настройка таблицы
 
         form = new ContactForm(this.companyService.findAll());
+        // установка реакции на события формы
+        form.addListener(ContactForm.SaveEvent.class, this::saveContact);
+        form.addListener(ContactForm.DeleteEvent.class, this::deleteContact);
+        form.addListener(ContactForm.CloseEvent.class, e -> closeEditor());
+
         Div content = new Div(grid, form);
         content.addClassName("content");
         content.setSizeFull();
@@ -111,5 +104,17 @@ public class MainView extends VerticalLayout {
     private void updateList() {
         // загрузим в таблицу все контакты
         grid.setItems(contactService.findAll(filterText.getValue()));
+    }
+
+    private void  saveContact(ContactForm.SaveEvent event) {
+        contactService.save(event.getContact());
+        updateList();
+        closeEditor();
+    }
+
+    private void deleteContact(ContactForm.DeleteEvent event) {
+        contactService.delete(event.getContact());
+        updateList();
+        closeEditor();
     }
 }
