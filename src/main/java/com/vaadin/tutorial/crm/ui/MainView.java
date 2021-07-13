@@ -2,6 +2,7 @@ package com.vaadin.tutorial.crm.ui;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -35,6 +36,8 @@ public class MainView extends VerticalLayout {
     private final ContactService contactService;
     // поле для указания фильтра
     private TextField filterText = new TextField();
+    // форма редактирования контакта
+    private ContactForm form;
 
     public MainView(ContactService contactService) {
         this.contactService = contactService;
@@ -42,7 +45,13 @@ public class MainView extends VerticalLayout {
         setSizeFull();              // размер во всё окно
         configureFilter();          // настройка фильтра
         configureGrid();            // настройка таблицы
-        add(filterText, grid);
+
+        form = new ContactForm();
+        Div content = new Div(grid, form);
+        content.addClassName("content");
+        content.setSizeFull();
+        add(filterText, content);
+
         updateList();
     }
 
