@@ -10,6 +10,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.tutorial.crm.backend.entity.Company;
 import com.vaadin.tutorial.crm.backend.entity.Contact;
+import com.vaadin.tutorial.crm.backend.service.CompanyService;
 import com.vaadin.tutorial.crm.backend.service.ContactService;
 
 /**
@@ -34,19 +35,21 @@ public class MainView extends VerticalLayout {
     // задание сущности для построения таблицы
     private Grid<Contact> grid = new Grid(Contact.class,false);
     private final ContactService contactService;
+    private final CompanyService companyService;
     // поле для указания фильтра
     private TextField filterText = new TextField();
     // форма редактирования контакта
     private ContactForm form;
 
-    public MainView(ContactService contactService) {
+    public MainView(ContactService contactService, CompanyService companyService) {
         this.contactService = contactService;
+        this.companyService = companyService;
         addClassName("list-view");  // класс CSS
         setSizeFull();              // размер во всё окно
         configureFilter();          // настройка фильтра
         configureGrid();            // настройка таблицы
 
-        form = new ContactForm();
+        form = new ContactForm(this.companyService.findAll());
         Div content = new Div(grid, form);
         content.addClassName("content");
         content.setSizeFull();
