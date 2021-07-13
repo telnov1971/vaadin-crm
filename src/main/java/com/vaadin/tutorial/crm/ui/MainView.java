@@ -5,6 +5,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.tutorial.crm.backend.entity.Company;
 import com.vaadin.tutorial.crm.backend.entity.Contact;
 import com.vaadin.tutorial.crm.backend.service.ContactService;
 
@@ -45,8 +46,20 @@ public class MainView extends VerticalLayout {
         grid.addClassName("contact-grid");
         grid.setSizeFull();
 
+        // удалить описание солдбца компании по умолчанию (ломает добавление столбца)
+        // grid.removeColumnByKey("company");
+
         // указание столбцов показанных в таблице
         grid.setColumns("firstName", "lastName", "email", "status");
+
+        // добавить собственные настройки столбца
+        grid.addColumn(contact -> {                             // для всех контактов
+            Company company = contact.getCompany();             // извлекаем ссылку на компанию
+            return company == null ? "-" : company.getName();   // возвращем название или прочерк
+        }).setHeader("Company");                                // ставим заголовок
+
+        // автоматическая ширина стобцов таблицы
+        grid.getColumns().forEach(col -> col.setAutoWidth(true));
     }
 
     private void updateList() {
